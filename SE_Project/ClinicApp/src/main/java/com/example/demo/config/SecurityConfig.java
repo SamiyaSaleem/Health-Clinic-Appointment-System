@@ -24,7 +24,7 @@ public class SecurityConfig {
             .requestCache(c -> c.disable())
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/login", "/h2-console/**", "/css/**", "/js/**").permitAll()
+            		.requestMatchers("/register", "/login", "/h2-console/**", "/css/**", "/js/**", "/appointments/**").permitAll()
                 .anyRequest().authenticated()
             )
 
