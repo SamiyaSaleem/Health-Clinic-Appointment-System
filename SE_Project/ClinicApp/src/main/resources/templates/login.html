@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Patient Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #4e73df, #1cc88a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 35px;
+      width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: gray;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #4e73df;
+      outline: none;
+      box-shadow: 0 0 5px rgba(78,115,223,0.5);
+    }
+
+    .remember {
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #4e73df;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #2e59d9;
+    }
+
+    .footer-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .footer-link a {
+      text-decoration: none;
+      color: #4e73df;
+      font-size: 14px;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+
+    .success {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <h2>HealthTech Clinic</h2>
+  <div class="subtitle">Access your patient dashboard</div>
+
+  <div th:if="${param.error}" class="alert error">
+    Invalid email or password.
+  </div>
+
+  <div th:if="${param.logout}" class="alert success">
+    Logged out successfully.
+  </div>
+
+  <form method="post" action="/login">
+
+    <label>Email</label>
+    <input type="text" name="username" required>
+
+    <label>Password</label>
+    <input type="password" name="password" required>
+
+    <div class="remember">
+      <input type="checkbox" name="remember-me" id="remember">
+      <label for="remember"> Remember Me</label>
+    </div>
+
+    <button type="submit">Login</button>
+
+  </form>
+
+  <div class="footer-link">
+    <a href="/register">Don't have an account? Register</a>
+  </div>
+
+</div>
+
+</body>
+</html>
