@@ -1,34 +1,34 @@
 package com.example.demo.service;
 
 import org.springframework.stereotype.Service;
-import com.example.demo.repository.PatientRepository;
+import com.example.demo.repository.UserRepository;
 
 @Service
 public class LoginAttemptService {
 
-    private final PatientRepository repo;
+    private final UserRepository repo;
 
-    public LoginAttemptService(PatientRepository repo) {
+    public LoginAttemptService(UserRepository repo) {
         this.repo = repo;
     }
 
     public void loginSucceeded(String email) {
-        repo.findByEmail(email).ifPresent(p -> {
-            p.setFailedAttempts(0);
-            p.setAccountLocked(false);
-            repo.save(p);
+        repo.findByEmail(email).ifPresent(u -> {
+            u.setFailedLoginAttempts(0);
+            u.setAccountLocked(false);
+            repo.save(u);
         });
     }
 
     public void loginFailed(String email) {
-        repo.findByEmail(email).ifPresent(p -> {
-            int attempts = p.getFailedAttempts() + 1;
-            p.setFailedAttempts(attempts);
+        repo.findByEmail(email).ifPresent(u -> {
+            int attempts = u.getFailedLoginAttempts() + 1;
+            u.setFailedLoginAttempts(attempts);
 
             if (attempts >= 5) {
-                p.setAccountLocked(true);
+                u.setAccountLocked(true);
             }
-            repo.save(p);
+            repo.save(u);
         });
     }
 }

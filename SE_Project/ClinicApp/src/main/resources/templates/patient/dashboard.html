@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 70px;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Dashboard Content */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #0284c7;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .card:nth-child(1) .card-icon {
+            background: rgba(2, 132, 199, 0.1);
+            color: #0284c7;
+        }
+
+        .card:nth-child(2) .card-icon {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .card:nth-child(3) .card-icon {
+            background: rgba(251, 146, 60, 0.1);
+            color: #fb923c;
+        }
+
+        .card:nth-child(4) .card-icon {
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+        }
+
+        .card-label {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .card-sublabel {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 8px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            border-color: #0284c7;
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+
+        .action-card i {
+            font-size: 28px;
+            color: #0284c7;
+            margin-bottom: 10px;
+        }
+
+        .action-card a {
+            text-decoration: none;
+            color: #1a202c;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .action-card a:hover {
+            color: #0284c7;
+        }
+
+        /* Recent Appointments */
+        .recent-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .appointments-table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .appointments-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #718096;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .appointments-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        .appointments-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-confirmed {
+            background: #dbeafe;
+            color: #0284c7;
+        }
+
+        .badge-completed {
+            background: #dcfce7;
+            color: #22c55e;
+        }
+
+        .badge-cancelled {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-view {
+            padding: 8px 12px;
+            background: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .btn-view:hover {
+            background: #0369a1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="fragments/sidebar :: sidebar"></div>
+
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Welcome back, <span th:text="${user.fullName}"></span>!</h1>
+                <p>Ready to manage your healthcare appointments?</p>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="card-label">Total Appointments</div>
+                    <div class="card-value" th:text="${totalAppointments}">0</div>
+                    <div class="card-sublabel">All time</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="card-label">Upcoming</div>
+                    <div class="card-value" th:text="${upcomingAppointments}">0</div>
+                    <div class="card-sublabel">Confirmed appointments</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="card-label">Pending</div>
+                    <div class="card-value" th:text="${pendingAppointments}">0</div>
+                    <div class="card-sublabel">Awaiting confirmation</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-label">Completed</div>
+                    <div class="card-value" th:text="${completedAppointments}">0</div>
+                    <div class="card-sublabel">Past appointments</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2 class="section-title">
+                    <i class="fas fa-lightning-bolt"></i>
+                    Quick Actions
+                </h2>
+                <div class="actions-grid">
+                    <div class="action-card">
+                        <i class="fas fa-calendar-plus"></i>
+                        <a href="/patient/appointments/new">Book Appointment</a>
+                    </div>
+                    <div class="action-card">
+                        <i class="fas fa-list"></i>
+                        <a href="/patient/appointments">View Appointments</a>
+                    </div>
+                    <div class="action-card">
+                        <i class="fas fa-user-cog"></i>
+                        <a href="/patient/profile">Edit Profile</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Appointments -->
+            <div class="recent-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Recent Appointments
+                    </h2>
+                    <a href="/patient/appointments" class="btn-view">View All</a>
+                </div>
+
+                <div th:if="${recentAppointments != null && !recentAppointments.isEmpty()}">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Specialization</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="apt : ${recentAppointments}">
+                                <td th:text="${apt.doctor.user.fullName}">Dr. Name</td>
+                                <td th:text="${apt.doctor.specialization}">Specialization</td>
+                                <td th:text="${#temporals.format(apt.appointmentDate, 'dd MMM')} + ' at ' + ${#temporals.format(apt.appointmentTime, 'HH:mm')}">01 Jan at 10:00</td>
+                                <td>
+                                    <span class="badge" th:classappend="${'badge-' + apt.status.name().toLowerCase()}" th:text="${apt.status}">Status</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${recentAppointments != null && !recentAppointments.isEmpty()}" class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>No appointments yet. Book your first appointment today!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

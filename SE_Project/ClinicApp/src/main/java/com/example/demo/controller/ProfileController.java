@@ -2,73 +2,37 @@ package com.example.demo.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import com.example.demo.entity.Patient;
-import com.example.demo.repository.PatientRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-
+/**
+ * DEPRECATED: Profile endpoints are now handled by role-specific controllers:
+ * - PatientController (/patient/profile)
+ * - DoctorController (/doctor/profile)
+ * - AdminController (/admin/users)
+ */
 @Controller
 public class ProfileController {
 
-    private final PatientRepository repo;
-
-    public ProfileController(PatientRepository repo) {
-        this.repo = repo;
-    }
-
     @GetMapping("/profile")
-    public String profile(Authentication auth, Model model) {
-        String email = auth.getName();
-        Patient p = repo.findByEmail(email).orElseThrow();
-
-        model.addAttribute("patient", p);
-        return "profile";
-    }
-
-    @PostMapping("/profile/update")
-    public String updateProfile(Authentication auth,
-                                @RequestParam String phone,
-                                @RequestParam String address) {
-
-        String email = auth.getName();
-        Patient p = repo.findByEmail(email).orElseThrow();
-
-        p.setPhone(phone);
-        p.setAddress(address);
-
-        repo.save(p);
-
-        return "redirect:/profile?success=true";
-    }
-    
-    @GetMapping("/profile/change-password")
-    public String changePasswordPage() {
-        return "change-password";
-    }
-
-    @PostMapping("/profile/change-password")
-    public String changePassword(Authentication auth,
-                                 @RequestParam String oldPassword,
-                                 @RequestParam String newPassword,
-                                 Model model) {
-
-        String email = auth.getName();
-        Patient p = repo.findByEmail(email).orElseThrow();
-
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-        if (!encoder.matches(oldPassword, p.getPasswordHash())) {
-            model.addAttribute("error", "Old password incorrect");
-            return "change-password";
+    public String profile(Authentication auth) {
+        if (auth == null) {
+            return "redirect:/login";
         }
-
-        p.setPasswordHash(encoder.encode(newPassword));
-        repo.save(p);
-
-        return "redirect:/profile?passwordChanged=true";
+        
+        String role = auth.getAuthorities().stream()
+            .findFirst()
+            .map(a -> a.getAuthority().replace("ROLE_", ""))
+            .orElse("");
+        
+        switch (role) {
+            case "PATIENT":
+                return "redirect:/patient/profile";
+            case "DOCTOR":
+                return "redirect:/doctor/profile";
+            case "ADMIN":
+                return "redirect:/admin/users";
+            default:
+                return "redirect:/login";
+        }
     }
-    
 }
