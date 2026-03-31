@@ -10,6 +10,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    private final CustomAuthenticationSuccessHandler successHandler;
+
+    public SecurityConfig(CustomAuthenticationSuccessHandler successHandler) {
+        this.successHandler = successHandler;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -24,24 +30,28 @@ public class SecurityConfig {
             .requestCache(c -> c.disable())
 
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/register", "/login", "/h2-console/**", "/css/**", "/js/**", "/appointments/**").permitAll()
+                .requestMatchers("/register", "/register-doctor", "/login", "/h2-console/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/patient/**").hasRole("PATIENT")
+                .requestMatchers("/doctor/**").hasRole("DOCTOR")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
 
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/", true)   // ALWAYS dashboard
+                .successHandler(successHandler)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
 
             .rememberMe(rm -> rm
-                .key("my-remember-key")
-                .tokenValiditySeconds(604800)
+                .key("appointcare-remember-key")
+                .tokenValiditySeconds(604800) // 7 days
             )
 
             .logout(l -> l
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .permitAll()
             );

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 70px;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 720px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 24px;
+            }
+
+            .form-container {
+                padding: 24px;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #0284c7;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0369a1;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="fragments/sidebar :: sidebar"></div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Book Appointment</h1>
+                <p>Schedule your next healthcare consultation</p>
+            </div>
+
+            <div class="form-container">
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div th:if="${doctors == null || doctors.isEmpty()}" class="alert alert-error">
+                    No doctors are available right now.
+                </div>
+
+                <div th:if="${param.booked}" class="alert alert-success">
+                    ✓ Appointment booked successfully!
+                </div>
+
+                <form method="POST" th:action="@{/patient/appointments/new}">
+                    <div class="form-group">
+                        <label for="specialization">Specialization *</label>
+                        <select id="specialization" name="specialization" required>
+                            <option value="">-- Select Specialization --</option>
+                            <option th:each="spec : ${specializations}" th:value="${spec}" th:text="${spec}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctor">Doctor *</label>
+                        <select id="doctor" name="doctorId" required>
+                            <option value="">-- Select Doctor --</option>
+                            <option
+                                th:each="doc : ${doctors}"
+                                th:value="${doc.id}"
+                                th:attr="data-spec=${doc.specialization}"
+                                th:text="${doc.user != null and doc.user.fullName != null ? doc.user.fullName : 'Doctor'}"
+                            ></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Appointment Date *</label>
+                        <input type="date" id="date" name="appointmentDate" required th:attr="min=${minDate}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time">Appointment Time *</label>
+                        <input type="time" id="time" name="appointmentTime" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reason">Reason for Visit *</label>
+                        <textarea id="reason" name="reason" required placeholder="Describe your health concern..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Book Appointment</button>
+                        <a href="/patient/appointments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const specializationSelect = document.getElementById('specialization');
+            const doctorSelect = document.getElementById('doctor');
+            if (!specializationSelect || !doctorSelect) return;
+
+            const doctorData = Array.from(doctorSelect.querySelectorAll('option'))
+                .slice(1)
+                .map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent || '',
+                    spec: (opt.getAttribute('data-spec') || '').trim().toLowerCase()
+                }));
+
+            function normalize(value) {
+                return (value || '').trim().toLowerCase();
+            }
+
+            function renderDoctorOptions() {
+                const specialization = normalize(specializationSelect.value);
+
+                doctorSelect.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = '-- Select Doctor --';
+                doctorSelect.appendChild(placeholder);
+                doctorSelect.value = '';
+
+                if (!specialization) {
+                    doctorSelect.disabled = true;
+                    return;
+                }
+
+                const matching = doctorData.filter(d => d.spec === specialization);
+                if (matching.length === 0) {
+                    const none = document.createElement('option');
+                    none.value = '';
+                    none.textContent = 'No doctors available for selected specialization';
+                    none.disabled = true;
+                    none.selected = true;
+                    doctorSelect.appendChild(none);
+                    doctorSelect.disabled = true;
+                    return;
+                }
+
+                matching.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.value;
+                    opt.textContent = d.text;
+                    doctorSelect.appendChild(opt);
+                });
+
+                doctorSelect.disabled = false;
+            }
+
+            specializationSelect.addEventListener('change', renderDoctorOptions);
+            renderDoctorOptions();
+        })();
+    </script>
+</body>
+</html>

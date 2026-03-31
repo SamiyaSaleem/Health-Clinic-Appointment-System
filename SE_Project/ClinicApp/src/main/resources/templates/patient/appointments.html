@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 70px;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .appointments-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .appointments-table thead th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #0284c7;
+        }
+
+        .appointments-table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .appointments-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending { background-color: #ffc107; color: #000; }
+        .status-confirmed { background-color: #0284c7; color: white; }
+        .status-completed { background-color: #198754; color: white; }
+        .status-cancelled { background-color: #dc3545; color: white; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0284c7;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .empty-state a:hover {
+            background-color: #0369a1;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="fragments/sidebar :: sidebar"></div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h1>My Appointments</h1>
+                <p>View and manage all your scheduled appointments</p>
+            </div>
+
+            <div class="appointments-container">
+                <div th:if="${appointments != null && !appointments.isEmpty()}">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>Doctor Name</th>
+                                <th>Specialization</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="apt : ${appointments}">
+                                <td th:text="${apt.doctor.user.fullName}">Dr. Name</td>
+                                <td th:text="${apt.doctor.specialization}">Specialization</td>
+                                <td th:text="${#temporals.format(apt.appointmentDate, 'dd MMM yyyy')}">01 Jan 2026</td>
+                                <td th:text="${#temporals.format(apt.appointmentTime, 'HH:mm')}">10:00</td>
+                                <td th:text="${apt.reason}">Reason</td>
+                                <td>
+                                    <span class="status-badge" th:classappend="${'status-' + apt.status.name().toLowerCase()}" th:text="${apt.status}">Status</span>
+                                </td>
+                                <td>
+                                    <form th:if="${apt.status.name() == 'PENDING' || (apt.status.name() == 'CONFIRMED' && apt.appointmentDate.isAfter(today))}" th:action="@{/patient/appointments/{id}/cancel(id=${apt.id})}" method="POST" style="display: inline;">
+                                        <button type="submit" class="action-btn btn-cancel">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${appointments != null && !appointments.isEmpty()}" class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>No appointments found.</p>
+                    <a href="/patient/appointments/new">Book your first appointment</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

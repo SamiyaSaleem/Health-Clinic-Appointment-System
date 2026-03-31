@@ -10,23 +10,23 @@ import com.example.demo.service.LoginAttemptService;
 @Component
 public class AuthEventListener {
 
-    private final LoginAttemptService attempts;
+    private final LoginAttemptService loginAttemptService;
 
-    public AuthEventListener(LoginAttemptService attempts) {
-        this.attempts = attempts;
+    public AuthEventListener(LoginAttemptService loginAttemptService) {
+        this.loginAttemptService = loginAttemptService;
     }
 
     @EventListener
     public void onSuccess(AuthenticationSuccessEvent e) {
         String email = e.getAuthentication().getName();
-        attempts.loginSucceeded(email);
+        loginAttemptService.loginSucceeded(email);
     }
 
     @EventListener
     public void onFailure(AbstractAuthenticationFailureEvent e) {
         Object principal = e.getAuthentication().getPrincipal();
         if (principal instanceof String email) {
-            attempts.loginFailed(email);
+            loginAttemptService.loginFailed(email);
         }
     }
 }

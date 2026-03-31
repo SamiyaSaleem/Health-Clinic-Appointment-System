@@ -1,125 +1,890 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Register</title>
-
+    <title>AppointCare Solutions - Create Account</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f9ff;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
+        }
+
+        /* Password input container */
+        .password-input-container {
+            position: relative;
+            display: flex;
             align-items: center;
-            height: 100vh;
         }
 
-        .card {
-            background: white;
-            padding: 35px;
-            width: 400px;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-        }
-
-        label {
-            font-weight: bold;
-            font-size: 14px;
-            color: #555;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            border-color: #4e73df;
-            outline: none;
-            box-shadow: 0 0 5px rgba(78,115,223,0.5);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
             border: none;
-            border-radius: 6px;
-            background-color: #4e73df;
+            cursor: pointer;
+            color: #64748b;
+            font-size: 18px;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #0284c7;
+        }
+
+        .password-input-container input[type="password"],
+        .password-input-container input[type="text"] {
+            padding-right: 45px;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Left Section - Polished Design */
+        .left-section {
+            flex: 1;
+            background: linear-gradient(135deg, #0b1f3a 0%, #123b73 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 60px 60px;
+            color: white;
+        }
+
+        .left-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .left-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 50px;
+        }
+
+        .left-logo-dot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #1e40af 0%, #123b73 100%);
+            border-radius: 50%;
             color: white;
             font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
         }
 
-        button:hover {
-            background-color: #2e59d9;
+        .left-section h1 {
+            font-size: 54px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
         }
 
-        .footer-link {
-            text-align: center;
-            margin-top: 15px;
+        .left-section p {
+            font-size: 17px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 85%;
+            font-weight: 300;
         }
 
-        .footer-link a {
-            text-decoration: none;
-            color: #4e73df;
+        .left-tagline {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: white;
+            overflow-y: auto;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .form-header {
+            margin-bottom: 28px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: #64748b;
             font-size: 14px;
         }
 
-        .footer-link a:hover {
+        .form-header a {
+            color: #0284c7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-header a:hover {
             text-decoration: underline;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0284c7;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #cbd5e1;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230284c7' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .form-group input.error,
+        .form-group select.error,
+        .form-group textarea.error {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .error-message {
+            font-size: 12px;
+            color: #dc2626;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Doctor-specific fields section */
+        .doctor-fields {
+            display: none;
+            padding: 16px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border: 1.5px solid #bae6fd;
+            margin-bottom: 18px;
+        }
+
+        .doctor-fields.show {
+            display: block;
+        }
+
+        .specialization-other {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .specialization-other.show {
+            display: block;
+        }
+
+        .doctor-fields-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0284c7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .doctor-availability-days {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .day-checkbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .day-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 6px;
+            cursor: pointer;
+            accent-color: #0284c7;
+        }
+
+        .day-checkbox label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #334155;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #16a34a;
+            border-left: 4px solid #16a34a;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #d97706;
+            border-left: 4px solid #d97706;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(2, 132, 199, 0.28);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .password-strength {
+            font-size: 12px;
+            margin-top: 6px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .strength-weak {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .strength-fair {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .strength-good {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* 1920x1080 - Larger screens */
+        @media (min-width: 1920px) {
+            .left-section {
+                padding: 80px 70px;
+            }
+
+            .left-section h1 {
+                font-size: 64px;
+                margin-bottom: 28px;
+            }
+
+            .left-section p {
+                font-size: 19px;
+            }
+
+            .left-logo {
+                font-size: 26px;
+                margin-bottom: 60px;
+            }
+
+            .left-tagline {
+                font-size: 16px;
+            }
+
+            .form-wrapper {
+                max-width: 450px;
+            }
+
+            .form-header h2 {
+                font-size: 36px;
+            }
+        }
+
+        /* 1366x768 - Standard desktop */
+        @media (max-width: 1366px) {
+            .left-section {
+                padding: 60px 50px;
+            }
+
+            .left-section h1 {
+                font-size: 58px;
+            }
+
+            .left-section p {
+                font-size: 16px;
+            }
+        }
+
+        /* Tablets and small screens */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-section {
+                padding: 40px 20px;
+                min-height: 300px;
+            }
+
+            .left-section h1 {
+                font-size: 36px;
+            }
+
+            .left-section p {
+                font-size: 14px;
+            }
+
+            .right-section {
+                flex: 1;
+                padding: 20px;
+            }
+
+            .form-wrapper {
+                max-width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .doctor-availability-days {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
-
 <body>
 
-<div class="card">
+<div class="container">
+    <div class="left-section">
+        <div class="left-logo">
+            <div class="left-logo-dot"><i class="fas fa-leaf"></i></div>
+            <span>AppointCare Solutions</span>
+        </div>
+        <div class="left-content">
+            <h1>Join AppointCare</h1>
+            <p>Create your account today and start managing your healthcare appointments with ease.</p>
+        </div>
+        <div class="left-tagline">Elevating Your Healthcare Experience</div>
+    </div>
 
-<h2>Patient Registration</h2>
+    <div class="right-section">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <h2>Create an account</h2>
+                <p>Already have an account? <a href="/login">Sign in</a></p>
+            </div>
 
-<form method="post" action="/register">
+            <div th:if="${param.error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${param.error}">Error message</span>
+            </div>
 
-    <label>Full Name</label>
-    <input type="text" name="fullName" required>
+            <form method="post" action="/register" id="registerForm" novalidate>
+                <!-- Flash messages -->
+                <div th:if="${error}" class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span th:text="${error}"></span>
+                </div>
+                <div th:if="${success}" class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span th:text="${success}"></span>
+                </div>
 
-    <label>Email</label>
-    <input type="email" name="email" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Ahmed Khan" required>
+                        <div class="error-message">Please enter your full name</div>
+                    </div>
 
-    <label>Phone</label>
-    <input type="text" name="phone" required>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        <div class="error-message">Please enter a valid email address</div>
+                    </div>
+                </div>
 
-    <label>Date of Birth</label>
-    <input type="date" name="dateOfBirth" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+923001234567" pattern="[0-9]{11,}" required>
+                        <div class="error-message">Must be 11 digits (e.g., 03001234567)</div>
+                    </div>
 
-    <label>Address</label>
-    <input type="text" name="address" required>
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                        <div class="error-message">Please select a valid date</div>
+                    </div>
+                </div>
 
-    <label>Password</label>
-    <input type="password" name="password" required>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" placeholder="123 Street, City" required>
+                    <div class="error-message">Please enter your address</div>
+                </div>
 
-    <button type="submit">Register</button>
+                <div class="form-group">
+                    <label for="role">Account Type</label>
+                    <select id="role" name="role" required>
+                        <option value="">-- Select Account Type --</option>
+                        <option value="PATIENT">Patient</option>
+                        <option value="DOCTOR">Doctor (Requires Approval)</option>
+                    </select>
+                    <div class="error-message">Please select an account type</div>
+                </div>
 
-</form>
+                <!-- Doctor-specific fields -->
+                <div class="doctor-fields" id="doctorFields">
+                    <div class="doctor-fields-title">
+                        <i class="fas fa-stethoscope"></i> Doctor Information
+                    </div>
 
-<div class="footer-link">
-    <a href="/login">Already have an account? Login</a>
+                    <div class="form-group">
+                        <label for="specialization">Specialization</label>
+                        <select id="specialization" name="specialization">
+                            <option value="">-- Select Specialization --</option>
+                            <option value="General Physician">General Physician</option>
+                            <option value="Cardiologist">Cardiologist</option>
+                            <option value="Dermatologist">Dermatologist</option>
+                            <option value="Pediatrician">Pediatrician</option>
+                            <option value="Orthopedic">Orthopedic Surgeon</option>
+                            <option value="Neurologist">Neurologist</option>
+                            <option value="ENT">ENT Specialist</option>
+                            <option value="Psychiatrist">Psychiatrist</option>
+                            <option value="OTHER">Other (type below)</option>
+                        </select>
+                        <input type="text" id="specializationOther" class="specialization-other" placeholder="Enter your specialization">
+                        <div class="error-message">Please select a specialization</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qualifications">Qualifications</label>
+                        <input type="text" id="qualifications" name="qualifications" placeholder="e.g. MBBS, FCPS, MD" required>
+                        <div class="error-message">Please enter your qualifications</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experienceYears">Years of Experience</label>
+                        <input type="number" id="experienceYears" name="experienceYears" placeholder="e.g. 10" min="0" max="60" required>
+                        <div class="error-message">Please enter years of experience</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Available Days</label>
+                        <div class="doctor-availability-days">
+                            <div class="day-checkbox">
+                                <input type="checkbox" id="mon" name="availableDays" value="MON">
+                                <label for="mon">Monday</label>
+                            </div>
+                            <div class="day-checkbox">
+                                <input type="checkbox" id="tue" name="availableDays" value="TUE">
+                                <label for="tue">Tuesday</label>
+                            </div>
+                            <div class="day-checkbox">
+                                <input type="checkbox" id="wed" name="availableDays" value="WED">
+                                <label for="wed">Wednesday</label>
+                            </div>
+                            <div class="day-checkbox">
+                                <input type="checkbox" id="thu" name="availableDays" value="THU">
+                                <label for="thu">Thursday</label>
+                            </div>
+                            <div class="day-checkbox">
+                                <input type="checkbox" id="fri" name="availableDays" value="FRI">
+                                <label for="fri">Friday</label>
+                            </div>
+                            <div class="day-checkbox">
+                                <input type="checkbox" id="sat" name="availableDays" value="SAT">
+                                <label for="sat">Saturday</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="availableTimeStart">Available Time Start</label>
+                            <input type="time" id="availableTimeStart" name="availableTimeStart" required>
+                            <div class="error-message">Please select a start time</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="availableTimeEnd">Available Time End</label>
+                            <input type="time" id="availableTimeEnd" name="availableTimeEnd" required>
+                            <div class="error-message">Please select an end time</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointmentDuration">Appointment Duration (minutes)</label>
+                        <input type="number" id="appointmentDuration" name="appointmentDuration" placeholder="30" value="30" min="15" max="120" required>
+                        <div class="error-message">Duration must be between 15-120 minutes</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')"><i class="fas fa-eye"></i></button>
+                        </div>
+                        <div class="error-message">Password must be at least 8 characters with uppercase, lowercase, and number</div>
+                        <div class="password-strength" id="strengthMeter"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword')"><i class="fas fa-eye"></i></button>
+                        </div>
+                        <div class="error-message">Passwords do not match</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register">Create Account</button>
+            </form>
+        </div>
+    </div>
 </div>
 
-</div>
+<script>
+    const registerForm = document.getElementById('registerForm');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const strengthMeter = document.getElementById('strengthMeter');
+    const roleSelect = document.getElementById('role');
+    const doctorFields = document.getElementById('doctorFields');
+    const specializationSelect = document.getElementById('specialization');
+    const specializationOther = document.getElementById('specializationOther');
 
+    function syncSpecializationOtherVisibility() {
+        if (!specializationSelect || !specializationOther) return;
+
+        const isOther = specializationSelect.value === 'OTHER';
+        specializationOther.classList.toggle('show', isOther);
+        specializationOther.required = isOther && roleSelect.value === 'DOCTOR';
+        if (!isOther) specializationOther.value = '';
+    }
+
+    // Show/hide doctor fields based on account type
+    roleSelect.addEventListener('change', function() {
+        if (this.value === 'DOCTOR') {
+            doctorFields.classList.add('show');
+            specializationSelect.required = true;
+            document.getElementById('qualifications').required = true;
+            document.getElementById('experienceYears').required = true;
+            document.getElementById('availableTimeStart').required = true;
+            document.getElementById('availableTimeEnd').required = true;
+        } else {
+            doctorFields.classList.remove('show');
+            specializationSelect.required = false;
+            document.getElementById('qualifications').required = false;
+            document.getElementById('experienceYears').required = false;
+            document.getElementById('availableTimeStart').required = false;
+            document.getElementById('availableTimeEnd').required = false;
+        }
+
+        syncSpecializationOtherVisibility();
+    });
+
+    specializationSelect.addEventListener('change', syncSpecializationOtherVisibility);
+    syncSpecializationOtherVisibility();
+
+    // Password strength checker
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+        if (password.length > 0) {
+            strengthMeter.classList.add('show');
+            if (strength < 3) {
+                strengthMeter.className = 'password-strength show strength-weak';
+                strengthMeter.innerHTML = '<i class="fas fa-circle"></i> Weak password';
+            } else if (strength < 4) {
+                strengthMeter.className = 'password-strength show strength-fair';
+                strengthMeter.innerHTML = '<i class="fas fa-circle"></i> Fair password';
+            } else {
+                strengthMeter.className = 'password-strength show strength-good';
+                strengthMeter.innerHTML = '<i class="fas fa-check-circle"></i> Strong password';
+            }
+        } else {
+            strengthMeter.classList.remove('show');
+        }
+    });
+
+    // Form validation
+    registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let isValid = true;
+
+        document.querySelectorAll('.error-message').forEach(msg => msg.classList.remove('show'));
+        document.querySelectorAll('input, select').forEach(field => field.classList.remove('error'));
+
+        const fullName = document.getElementById('fullName');
+        if (fullName.value.trim().length < 2) {
+            fullName.classList.add('error');
+            fullName.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        const email = document.getElementById('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value)) {
+            email.classList.add('error');
+            email.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        const phone = document.getElementById('phone');
+        const phoneRegex = /^[0-9]{11}$/;
+        if (!phoneRegex.test(phone.value.replace(/\D/g, ''))) {
+            phone.classList.add('error');
+            phone.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        const dob = document.getElementById('dateOfBirth');
+        const dobDate = new Date(dob.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (dobDate >= today) {
+            dob.classList.add('error');
+            dob.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        if (!roleSelect.value) {
+            roleSelect.classList.add('error');
+            roleSelect.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        if (roleSelect.value === 'DOCTOR') {
+            if (!specializationSelect.value) {
+                specializationSelect.classList.add('error');
+                specializationSelect.parentElement.querySelector('.error-message').classList.add('show');
+                isValid = false;
+            }
+
+            if (specializationSelect.value === 'OTHER') {
+                const customSpec = (specializationOther.value || '').trim();
+                if (!customSpec) {
+                    specializationOther.classList.add('error');
+                    specializationSelect.parentElement.querySelector('.error-message').textContent = 'Please enter your specialization';
+                    specializationSelect.parentElement.querySelector('.error-message').classList.add('show');
+                    isValid = false;
+                } else {
+                    specializationSelect.parentElement.querySelector('.error-message').textContent = 'Please select a specialization';
+                }
+            } else {
+                specializationSelect.parentElement.querySelector('.error-message').textContent = 'Please select a specialization';
+            }
+
+            const qual = document.getElementById('qualifications');
+            if (qual.value.trim().length < 3) {
+                qual.classList.add('error');
+                qual.parentElement.querySelector('.error-message').classList.add('show');
+                isValid = false;
+            }
+
+            const exp = document.getElementById('experienceYears');
+            if (isNaN(exp.value) || exp.value < 0) {
+                exp.classList.add('error');
+                exp.parentElement.querySelector('.error-message').classList.add('show');
+                isValid = false;
+            }
+
+            const availableDays = document.querySelectorAll('input[name="availableDays"]:checked');
+            if (availableDays.length === 0) {
+                document.querySelector('.doctor-availability-days').style.borderColor = '#dc2626';
+                isValid = false;
+            }
+
+            const timeStart = document.getElementById('availableTimeStart');
+            if (!timeStart.value) {
+                timeStart.classList.add('error');
+                timeStart.parentElement.querySelector('.error-message').classList.add('show');
+                isValid = false;
+            }
+
+            const timeEnd = document.getElementById('availableTimeEnd');
+            if (!timeEnd.value) {
+                timeEnd.classList.add('error');
+                timeEnd.parentElement.querySelector('.error-message').classList.add('show');
+                isValid = false;
+            }
+        }
+
+        const password = document.getElementById('password');
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password.value)) {
+            password.classList.add('error');
+            password.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        const confirmPassword = document.getElementById('confirmPassword');
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.classList.add('error');
+            confirmPassword.parentElement.querySelector('.error-message').classList.add('show');
+            isValid = false;
+        }
+
+        if (isValid) {
+            if (roleSelect.value === 'DOCTOR' && specializationSelect.value === 'OTHER') {
+                const customSpec = specializationOther.value.trim();
+                const existing = Array.from(specializationSelect.options).find(o => o.value === customSpec);
+                if (!existing) {
+                    specializationSelect.add(new Option(customSpec, customSpec, true, true));
+                }
+                specializationSelect.value = customSpec;
+            }
+            registerForm.submit();
+        }
+    });
+
+    // Toggle password visibility
+    function togglePasswordVisibility(fieldId) {
+        const field = document.getElementById(fieldId);
+        const button = event.target.closest('.password-toggle');
+        const icon = button.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 </body>
 </html>
