@@ -30,7 +30,7 @@ public class SecurityConfig {
             .requestCache(c -> c.disable())
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/register-doctor", "/login", "/h2-console/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/register", "/login", "/h2-console/**", "/css/**", "/js/**").permitAll()
                 .requestMatchers("/patient/**").hasRole("PATIENT")
                 .requestMatchers("/doctor/**").hasRole("DOCTOR")
                 .requestMatchers("/admin/**").hasRole("ADMIN")

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Requests - Admin - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; }
+        .container { display: flex; height: 100vh; }
+        .main-content { flex: 1; margin-left: 70px; padding: 40px; overflow-y: auto; }
+
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 28px; font-weight: 800; color: #0f1f3d; margin-bottom: 4px; }
+        .page-header p { color: #64748b; font-size: 14px; }
+
+        .flash { padding: 13px 16px; border-radius: 10px; margin-bottom: 16px; max-width: 1100px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .flash-success { background: #dcfce7; border: 1px solid #bbf7d0; color: #166534; }
+        .flash-error   { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; max-width: 1100px; }
+        .summary-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); border: 1px solid #e8edf5; border-left: 4px solid #0284c7; }
+        .summary-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; }
+        .summary-value { margin-top: 6px; font-size: 28px; font-weight: 800; color: #0f1f3d; }
+
+        .card { background: #fff; border-radius: 14px; padding: 26px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); max-width: 1100px; border: 1px solid #e8edf5; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        th { padding: 12px 14px; text-align: left; font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: #64748b; font-weight: 700; }
+        td { padding: 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; color: #1e293b; font-size: 14px; }
+        tbody tr:hover { background: #f8fafc; }
+        .muted { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1px solid transparent; }
+        .badge-open     { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+        .badge-resolved { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+
+        .btn { padding: 8px 14px; border: none; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; background: #0284c7; color: #fff; transition: background 0.2s; font-family: inherit; }
+        .btn:hover { background: #0369a1; }
+
+        @media (max-width: 768px) { .main-content { padding: 24px; } td:nth-child(3), th:nth-child(3) { display:none; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Support Requests</h1>
+            <p>Review and resolve requests submitted by users.</p>
+        </div>
+
+        <div th:if="${param.resolved}" class="flash flash-success"><i class="fas fa-check-circle"></i> Marked as resolved.</div>
+        <div th:if="${error != null}" class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error</span></div>
+
+        <div class="summary">
+            <div class="summary-card" style="border-left-color:#f59e0b;">
+                <div class="summary-label">Open</div>
+                <div class="summary-value" th:text="${openCount}">0</div>
+            </div>
+            <div class="summary-card" style="border-left-color:#22c55e;">
+                <div class="summary-label">Resolved</div>
+                <div class="summary-value" th:text="${resolvedCount}">0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div th:if="${requests != null && !requests.isEmpty()}">
+                <table>
+                    <thead><tr><th>Status</th><th>User</th><th>Date</th><th>Subject</th><th>Message</th><th>Action</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${requests}">
+                        <td><span class="badge" th:classappend="${r.resolved ? ' badge-resolved' : ' badge-open'}" th:text="${r.resolved ? 'RESOLVED' : 'OPEN'}">OPEN</span></td>
+                        <td>
+                            <div style="font-weight:600;" th:text="${r.user != null ? r.user.fullName : '—'}">Name</div>
+                            <div class="muted" th:text="${r.user != null ? r.user.email : ''}">email</div>
+                        </td>
+                        <td style="white-space:nowrap;" th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy HH:mm')}">date</td>
+                        <td style="font-weight:600;" th:text="${r.subject}">subject</td>
+                        <td style="max-width:280px; color:#475569;" th:text="${r.message}">message</td>
+                        <td>
+                            <form th:if="${!r.resolved}" th:action="@{/admin/support/{id}/resolve(id=${r.id})}" method="POST">
+                                <button type="submit" class="btn">Resolve</button>
+                            </form>
+                            <span th:if="${r.resolved}" class="muted">Resolved</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:unless="${requests != null && !requests.isEmpty()}" style="color:#94a3b8; padding:20px 0;">No support requests yet.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

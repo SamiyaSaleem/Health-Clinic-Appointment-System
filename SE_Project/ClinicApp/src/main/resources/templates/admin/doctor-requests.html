@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Approval Requests - Admin - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; }
+        .container { display: flex; height: 100vh; }
+        .main-content { flex: 1; margin-left: 70px; padding: 40px; overflow-y: auto; }
+
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .page-header-left h1 { font-size: 28px; font-weight: 800; color: #0f1f3d; margin-bottom: 4px; display: flex; align-items: center; gap: 12px; }
+        .page-header-left h1 i { color: #f59e0b; font-size: 24px; }
+        .page-header-left p { color: #64748b; font-size: 14px; }
+
+        .btn-back { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 9px; color: #374151; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        .btn-back:hover { border-color: #1e3c72; color: #1e3c72; background: #f0f4ff; }
+
+        .flash { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: center; gap: 10px; max-width: 1200px; font-weight: 500; }
+        .flash-success { background: #dcfce7; border: 1px solid #bbf7d0; color: #166534; }
+        .flash-error   { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+
+        .summary-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+        .summary-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 20px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 999px; font-size: 13px; font-weight: 700; color: #374151; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .pill-count { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #f59e0b; color: #fff; border-radius: 999px; font-size: 12px; font-weight: 900; }
+
+        .requests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 22px; max-width: 1200px; }
+
+        .request-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden; border: 1.5px solid #e8edf5; transition: box-shadow 0.25s, transform 0.25s; }
+        .request-card:hover { box-shadow: 0 8px 28px rgba(30,60,114,0.12); transform: translateY(-3px); }
+        .card-strip { height: 4px; background: linear-gradient(90deg, #f59e0b, #fb923c); }
+        .card-body { padding: 24px; }
+
+        .doc-identity { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid #f1f5f9; }
+        .doc-avatar { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .doc-name { font-size: 17px; font-weight: 800; color: #0f1f3d; margin-bottom: 3px; }
+        .doc-email { font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 6px; }
+        .badge-pending { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #fef3c7; border: 1px solid #fde68a; color: #92400e; border-radius: 999px; font-size: 11px; font-weight: 800; margin-left: auto; white-space: nowrap; }
+
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-bottom: 18px; }
+        .detail-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 3px; }
+        .detail-value { font-size: 14px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 6px; }
+        .detail-value i { color: #1e3c72; font-size: 12px; width: 14px; text-align: center; }
+
+        .avail-section { background: #f8fafc; border: 1px solid #e8edf5; border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
+        .avail-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+        .avail-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .day-chip { padding: 4px 10px; background: #e0e7ff; color: #3730a3; border-radius: 999px; font-size: 11px; font-weight: 700; }
+        .time-range { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #374151; background: #f1f5f9; padding: 4px 12px; border-radius: 8px; }
+        .duration-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 11px; font-weight: 700; }
+
+        .card-actions { display: flex; gap: 10px; padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e8edf5; }
+        .btn { flex: 1; padding: 11px 16px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; font-family: inherit; }
+        .btn-approve { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; box-shadow: 0 2px 8px rgba(34,197,94,0.25); }
+        .btn-approve:hover { box-shadow: 0 4px 14px rgba(34,197,94,0.4); transform: translateY(-1px); }
+        .btn-reject { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 2px 8px rgba(239,68,68,0.25); }
+        .btn-reject:hover { box-shadow: 0 4px 14px rgba(239,68,68,0.4); transform: translateY(-1px); }
+
+        .empty-state { max-width: 460px; margin: 60px auto; text-align: center; background: #fff; border-radius: 16px; padding: 52px 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .empty-icon { width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #dcfce7, #bbf7d0); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .empty-icon i { font-size: 32px; color: #16a34a; }
+        .empty-state h2 { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; color: #6b7280; margin-bottom: 22px; }
+        .btn-outline { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: #1e3c72; color: #fff; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 700; transition: background 0.2s; }
+        .btn-outline:hover { background: #2a5298; }
+
+        @media (max-width: 768px) { .main-content { padding: 20px; } .requests-grid { grid-template-columns: 1fr; } .detail-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1><i class="fas fa-user-clock"></i> Doctor Approval Requests</h1>
+                <p>Review each pending application in full before making a decision.</p>
+            </div>
+            <a href="/admin/doctors" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Manage Doctors
+            </a>
+        </div>
+
+        <div th:if="${param.approved}" class="flash flash-success"><i class="fas fa-check-circle"></i> Doctor approved and is now active.</div>
+        <div th:if="${param.rejected}" class="flash flash-success"><i class="fas fa-check-circle"></i> Doctor application rejected.</div>
+        <div th:if="${success != null}" class="flash flash-success"><i class="fas fa-check-circle"></i> <span th:text="${success}"></span></div>
+        <div th:if="${error != null}" class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span></div>
+
+        <div class="summary-bar">
+            <div class="summary-pill">
+                <i class="fas fa-hourglass-half" style="color:#f59e0b;"></i>
+                Pending Requests
+                <span class="pill-count" th:text="${pendingCount}">0</span>
+            </div>
+        </div>
+
+        <div th:if="${pending != null and !pending.isEmpty()}" class="requests-grid">
+            <div th:each="d : ${pending}" class="request-card">
+                <div class="card-strip"></div>
+                <div class="card-body">
+                    <div class="doc-identity">
+                        <div class="doc-avatar" th:text="${d.user != null and d.user.fullName != null ? d.user.fullName.substring(0,1).toUpperCase() : '?'}">D</div>
+                        <div>
+                            <div class="doc-name" th:text="${d.user != null ? d.user.fullName : '—'}">Dr. Name</div>
+                            <div class="doc-email"><i class="fas fa-envelope"></i> <span th:text="${d.user != null ? d.user.email : '—'}">email@doctor.com</span></div>
+                        </div>
+                        <span class="badge-pending"><i class="fas fa-hourglass-half"></i> PENDING</span>
+                    </div>
+
+                    <div class="detail-grid">
+                        <div>
+                            <div class="detail-label">Specialization</div>
+                            <div class="detail-value"><i class="fas fa-stethoscope"></i> <span th:text="${d.specialization != null ? d.specialization : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Experience</div>
+                            <div class="detail-value"><i class="fas fa-briefcase-medical"></i> <span th:text="${d.experienceYears != null ? d.experienceYears + ' year(s)' : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Qualifications</div>
+                            <div class="detail-value"><i class="fas fa-graduation-cap"></i> <span th:text="${d.qualifications != null ? d.qualifications : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value"><i class="fas fa-phone"></i> <span th:text="${d.user != null and d.user.phone != null ? d.user.phone : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Date of Birth</div>
+                            <div class="detail-value"><i class="fas fa-birthday-cake"></i> <span th:text="${d.user != null and d.user.dateOfBirth != null ? #temporals.format(d.user.dateOfBirth, 'dd MMM yyyy') : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Address</div>
+                            <div class="detail-value"><i class="fas fa-map-marker-alt"></i> <span th:text="${d.user != null and d.user.address != null ? d.user.address : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Slot Duration</div>
+                            <div class="detail-value"><i class="fas fa-clock"></i> <span th:text="${d.appointmentDurationMinutes != null ? d.appointmentDurationMinutes + ' min' : '—'}">—</span></div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Applied On</div>
+                            <div class="detail-value"><i class="fas fa-calendar-alt"></i> <span th:text="${d.createdAt != null ? #temporals.format(d.createdAt, 'dd MMM yyyy') : '—'}">—</span></div>
+                        </div>
+                    </div>
+
+                    <div class="avail-section">
+                        <div class="avail-title"><i class="fas fa-calendar-week" style="color:#1e3c72;"></i> Availability Schedule</div>
+                        <div class="avail-row">
+                            <span th:if="${d.availableDays != null and !d.availableDays.isEmpty()}">
+                                <span th:each="day : ${d.availableDays.split(',')}" class="day-chip" th:text="${day.trim()}">MON</span>
+                            </span>
+                            <span th:unless="${d.availableDays != null and !d.availableDays.isEmpty()}" style="color:#94a3b8; font-size:13px;">No days set</span>
+                            <span th:if="${d.availableTimeStart != null and d.availableTimeEnd != null}" class="time-range">
+                                <i class="fas fa-clock" style="color:#1e3c72;"></i>
+                                <span th:text="${#temporals.format(d.availableTimeStart, 'HH:mm')}">09:00</span> –
+                                <span th:text="${#temporals.format(d.availableTimeEnd, 'HH:mm')}">17:00</span>
+                            </span>
+                            <span th:if="${d.appointmentDurationMinutes != null}" class="duration-chip">
+                                <i class="fas fa-stopwatch"></i>
+                                <span th:text="${d.appointmentDurationMinutes + ' min slots'}">30 min slots</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <form th:action="@{/admin/doctors/{id}/approve-from-requests(id=${d.id})}" method="POST" style="flex:1; display:flex;">
+                        <button type="submit" class="btn btn-approve"><i class="fas fa-check"></i> Approve</button>
+                    </form>
+                    <form th:action="@{/admin/doctors/{id}/reject-from-requests(id=${d.id})}" method="POST" style="flex:1; display:flex;"
+                          onsubmit="return confirm('Reject and permanently delete this doctor application?')">
+                        <button type="submit" class="btn btn-reject"><i class="fas fa-times"></i> Reject</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:unless="${pending != null and !pending.isEmpty()}" class="empty-state">
+            <div class="empty-icon"><i class="fas fa-check-double"></i></div>
+            <h2>All Caught Up</h2>
+            <p>There are no pending doctor applications to review right now.</p>
+            <a href="/admin/doctors" class="btn-outline"><i class="fas fa-user-md"></i> View All Doctors</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

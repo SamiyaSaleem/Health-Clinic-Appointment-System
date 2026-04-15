@@ -1,4 +1,4 @@
-<div xmlns:th="http://www.thymeleaf.org" th:fragment="sidebar" class="sidebar">
+<div xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="sidebar" class="sidebar">
     <div class="sidebar-header">
         <i class="fas fa-leaf"></i>
     </div>
@@ -8,22 +8,80 @@
     </div>
 
     <nav class="sidebar-nav">
-        <a href="/patient/dashboard" class="sidebar-item" title="Dashboard">
-            <i class="fas fa-home"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="/patient/appointments/new" class="sidebar-item" title="Book Appointment">
-            <i class="fas fa-calendar-plus"></i>
-            <span>Book Appointment</span>
-        </a>
-        <a href="/patient/appointments" class="sidebar-item" title="My Appointments">
-            <i class="fas fa-calendar-check"></i>
-            <span>My Appointments</span>
-        </a>
-        <a href="/patient/profile" class="sidebar-item" title="Profile">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </a>
+        <div sec:authorize="hasRole('PATIENT')">
+            <a href="/patient/dashboard" class="sidebar-item" title="Dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/patient/appointments/new" class="sidebar-item" title="Book Appointment">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Book Appointment</span>
+            </a>
+            <a href="/patient/appointments" class="sidebar-item" title="Manage Appointments">
+                <i class="fas fa-calendar-check"></i>
+                <span>Manage Appointments</span>
+            </a>
+            <a href="/patient/profile" class="sidebar-item" title="Manage Profile">
+                <i class="fas fa-user"></i>
+                <span>Manage Profile</span>
+            </a>
+            <a href="/support" class="sidebar-item" title="Contact Support">
+                <i class="fas fa-envelope"></i>
+                <span>Contact Support</span>
+            </a>
+        </div>
+
+        <div sec:authorize="hasRole('DOCTOR')">
+            <a href="/doctor/dashboard" class="sidebar-item" title="Dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/doctor/appointments" class="sidebar-item" title="Manage Appointments">
+                <i class="fas fa-calendar-check"></i>
+                <span>Manage Appointments</span>
+            </a>
+            <a href="/doctor/profile" class="sidebar-item" title="Manage Profile">
+                <i class="fas fa-user-md"></i>
+                <span>Manage Profile</span>
+            </a>
+            <a href="/support" class="sidebar-item" title="Contact Support">
+                <i class="fas fa-envelope"></i>
+                <span>Contact Support</span>
+            </a>
+        </div>
+
+        <div sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/dashboard" class="sidebar-item" title="Admin Dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin/appointments" class="sidebar-item" title="Manage Appointments">
+                <i class="fas fa-calendar-check"></i>
+                <span>Manage Appointments</span>
+            </a>
+            <a href="/admin/doctors" class="sidebar-item" title="Manage Doctors">
+                <i class="fas fa-user-md"></i>
+                <span>Manage Doctors</span>
+            </a>
+            <a href="/admin/doctors/requests" class="sidebar-item" title="Doctor Approval Requests" style="position:relative;">
+                <i class="fas fa-user-clock"></i>
+                <span>Doctor Requests</span>
+                <span th:with="cnt=${@doctorService.getPendingApprovals().size()}"
+                      th:if="${cnt > 0}"
+                      th:text="${cnt}"
+                      style="margin-left:auto; background:#f59e0b; color:#fff; border-radius:999px;
+                             font-size:11px; font-weight:900; padding:2px 7px; line-height:1.5;
+                             min-width:20px; text-align:center;">0</span>
+            </a>
+            <a href="/admin/users" class="sidebar-item" title="Manage Users">
+                <i class="fas fa-users"></i>
+                <span>Manage Users</span>
+            </a>
+            <a href="/admin/support" class="sidebar-item" title="Support Requests">
+                <i class="fas fa-life-ring"></i>
+                <span>Support Requests</span>
+            </a>
+        </div>
     </nav>
 
     <div class="sidebar-footer">

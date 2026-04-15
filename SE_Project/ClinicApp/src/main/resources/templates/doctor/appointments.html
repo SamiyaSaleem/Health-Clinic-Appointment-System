@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments - Doctor - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; }
+        .container { display: flex; height: 100vh; }
+        .main-content { flex: 1; margin-left: 70px; padding: 40px; overflow-y: auto; }
+
+        .page-header { margin-bottom: 22px; }
+        .page-header h1 { font-size: 28px; font-weight: 800; color: #0f1f3d; margin-bottom: 4px; }
+        .page-header p { color: #64748b; font-size: 14px; }
+
+        .flash { padding: 13px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .flash-success { background: #dcfce7; border: 1px solid #bbf7d0; color: #166534; }
+        .flash-error   { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+
+        .filters-bar { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 999px; background: #fff; border: 1.5px solid #e2e8f0; color: #334155; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.18s; }
+        .chip:hover { border-color: #0284c7; color: #0284c7; }
+        .chip.active { background: rgba(2,132,199,0.08); border-color: rgba(2,132,199,0.4); color: #0369a1; font-weight: 700; }
+        .chip-count { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 800; }
+
+        .filter-form { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+        .filter-field { display: flex; flex-direction: column; gap: 5px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input { height: 38px; padding: 0 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 14px; background: #fff; }
+        .input:focus { outline: none; border-color: #0284c7; }
+        .btn-link { display: inline-flex; align-items: center; justify-content: center; height: 38px; padding: 0 14px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; color: #0284c7; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 13px; }
+        .btn-link:hover { border-color: #0284c7; background: #f0f9ff; }
+
+        .appointments-container { background: #fff; border-radius: 14px; padding: 26px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); border: 1px solid #e8edf5; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        th { padding: 12px 14px; text-align: left; font-weight: 700; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; }
+        td { padding: 13px 14px; border-bottom: 1px solid #f1f5f9; color: #1e293b; vertical-align: top; font-size: 14px; }
+        tbody tr:hover { background: #f8fafc; }
+
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .badge-pending   { background: #fef3c7; color: #d97706; }
+        .badge-confirmed { background: #dbeafe; color: #0284c7; }
+        .badge-completed { background: #dcfce7; color: #166534; }
+        .badge-cancelled { background: #fee2e2; color: #dc2626; }
+        .badge-no_show   { background: #e5e7eb; color: #374151; }
+
+        .actions { display: flex; flex-direction: column; gap: 10px; }
+        .action-row { display: flex; gap: 8px; align-items: center; }
+        .action-row .input { flex: 1; min-width: 150px; }
+        .row-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+        .btn { padding: 7px 14px; border: none; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.18s; font-family: inherit; }
+        .btn-approve { background: #22c55e; color: #fff; }
+        .btn-approve:hover { background: #16a34a; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-neutral { background: #0ea5e9; color: #fff; }
+        .btn-neutral:hover { background: #0284c7; }
+
+        .muted { color: #94a3b8; font-size: 13px; }
+
+        @media (max-width: 768px) { .main-content { padding: 24px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Appointments</h1>
+            <p>Review and manage all your appointment requests.</p>
+        </div>
+
+        <div th:if="${param.approved}" class="flash flash-success"><i class="fas fa-check-circle"></i> Appointment approved.</div>
+        <div th:if="${param.rejected}" class="flash flash-success"><i class="fas fa-check-circle"></i> Appointment rejected.</div>
+        <div th:if="${param.completed}" class="flash flash-success"><i class="fas fa-check-circle"></i> Appointment marked completed.</div>
+        <div th:if="${param.noShow}" class="flash flash-success"><i class="fas fa-check-circle"></i> Appointment marked no-show.</div>
+        <div th:if="${param.cancelled}" class="flash flash-success"><i class="fas fa-check-circle"></i> Appointment cancelled.</div>
+        <div th:if="${error != null}" class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error</span></div>
+
+        <div class="filters-bar">
+            <div class="chips">
+                <a class="chip" th:classappend="${filterStatus == null ? ' active' : ''}" th:href="@{/doctor/appointments(from=${filterFrom}, to=${filterTo})}">All <span class="chip-count" th:text="${countTotal}">0</span></a>
+                <a class="chip" th:classappend="${filterStatus == 'PENDING' ? ' active' : ''}" th:href="@{/doctor/appointments(status='PENDING', from=${filterFrom}, to=${filterTo})}">Pending <span class="chip-count" th:text="${countPending}">0</span></a>
+                <a class="chip" th:classappend="${filterStatus == 'CONFIRMED' ? ' active' : ''}" th:href="@{/doctor/appointments(status='CONFIRMED', from=${filterFrom}, to=${filterTo})}">Confirmed <span class="chip-count" th:text="${countConfirmed}">0</span></a>
+                <a class="chip" th:classappend="${filterStatus == 'COMPLETED' ? ' active' : ''}" th:href="@{/doctor/appointments(status='COMPLETED', from=${filterFrom}, to=${filterTo})}">Completed <span class="chip-count" th:text="${countCompleted}">0</span></a>
+                <a class="chip" th:classappend="${filterStatus == 'CANCELLED' ? ' active' : ''}" th:href="@{/doctor/appointments(status='CANCELLED', from=${filterFrom}, to=${filterTo})}">Cancelled <span class="chip-count" th:text="${countCancelled}">0</span></a>
+                <a class="chip" th:classappend="${filterStatus == 'NO_SHOW' ? ' active' : ''}" th:href="@{/doctor/appointments(status='NO_SHOW', from=${filterFrom}, to=${filterTo})}">No-show <span class="chip-count" th:text="${countNoShow}">0</span></a>
+            </div>
+            <form class="filter-form" method="GET" th:action="@{/doctor/appointments}">
+                <input type="hidden" name="status" th:value="${filterStatus}" />
+                <div class="filter-field"><label for="from">From</label><input class="input" id="from" type="date" name="from" th:value="${filterFrom}" onchange="this.form.submit()" /></div>
+                <div class="filter-field"><label for="to">To</label><input class="input" id="to" type="date" name="to" th:value="${filterTo}" onchange="this.form.submit()" /></div>
+                <a class="btn-link" th:href="@{/doctor/appointments}">Clear</a>
+            </form>
+        </div>
+
+        <div class="appointments-container">
+            <div th:if="${appointments != null && !appointments.isEmpty()}">
+                <table>
+                    <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:each="apt : ${appointments}">
+                        <td style="font-weight:600;" th:text="${apt.patient != null ? apt.patient.fullName : '—'}">Patient</td>
+                        <td th:text="${apt.appointmentDate != null ? #temporals.format(apt.appointmentDate, 'dd MMM yyyy') : '—'}">01 Jan 2026</td>
+                        <td th:text="${apt.appointmentTime != null ? #temporals.format(apt.appointmentTime, 'HH:mm') : '—'}">10:00</td>
+                        <td>
+                            <div style="color:#475569;" th:text="${apt.reason}">Reason</div>
+                            <div class="muted" th:if="${apt.notes != null && !#strings.isEmpty(apt.notes)}" th:text="${'Notes: ' + apt.notes}">Notes</div>
+                            <div class="muted" th:if="${apt.cancellationReason != null && !#strings.isEmpty(apt.cancellationReason)}" th:text="${'Cancelled: ' + apt.cancellationReason}">Cancellation</div>
+                        </td>
+                        <td><span class="badge" th:classappend="${' badge-' + apt.status.name().toLowerCase()}" th:text="${apt.status}">STATUS</span></td>
+                        <td>
+                            <div class="actions">
+                                <div th:if="${doctor != null && doctor.approved}">
+                                    <div th:if="${apt.status.name() == 'PENDING'}">
+                                        <div class="action-row" style="margin-bottom:8px;">
+                                            <form th:action="@{/doctor/appointments/{id}/approve(id=${apt.id})}" method="POST">
+                                                <input type="hidden" name="returnTo" value="/doctor/appointments" />
+                                                <button class="btn btn-approve" type="submit"><i class="fas fa-check"></i> Approve</button>
+                                            </form>
+                                        </div>
+                                        <form th:action="@{/doctor/appointments/{id}/reject(id=${apt.id})}" method="POST" class="action-row">
+                                            <input type="hidden" name="returnTo" value="/doctor/appointments" />
+                                            <input class="input" name="reason" placeholder="Rejection reason" required />
+                                            <button class="btn btn-danger" type="submit">Reject</button>
+                                        </form>
+                                    </div>
+                                    <div th:if="${apt.status.name() == 'CONFIRMED'}" class="row-actions">
+                                        <form th:action="@{/doctor/appointments/{id}/complete(id=${apt.id})}" method="POST">
+                                            <input type="hidden" name="returnTo" value="/doctor/appointments" />
+                                            <button class="btn btn-neutral" type="submit">Completed</button>
+                                        </form>
+                                        <form th:action="@{/doctor/appointments/{id}/no-show(id=${apt.id})}" method="POST">
+                                            <input type="hidden" name="returnTo" value="/doctor/appointments" />
+                                            <button class="btn btn-danger" type="submit">No-Show</button>
+                                        </form>
+                                    </div>
+                                    <div class="muted" th:if="${apt.status.name() != 'PENDING' && apt.status.name() != 'CONFIRMED'}">—</div>
+                                </div>
+                                <div class="muted" th:if="${doctor != null && !doctor.approved}">Awaiting admin approval.</div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:unless="${appointments != null && !appointments.isEmpty()}" class="muted" style="padding:20px 0;">No appointments found.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

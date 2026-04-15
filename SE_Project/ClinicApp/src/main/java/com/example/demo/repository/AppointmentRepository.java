@@ -1,7 +1,9 @@
 package com.example.demo.repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,8 +31,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // General queries
     List<Appointment> findByStatus(AppointmentStatus status);
+    long countByStatus(AppointmentStatus status);
     Page<Appointment> findByStatus(AppointmentStatus status, Pageable pageable);
     Page<Appointment> findByPatient(User patient, Pageable pageable);
     Page<Appointment> findByDoctor(Doctor doctor, Pageable pageable);
     List<Appointment> findByAppointmentDateAndDoctor(LocalDate date, Doctor doctor);
+
+    // Clash/slots helpers
+    boolean existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatusIn(Doctor doctor, LocalDate appointmentDate, LocalTime appointmentTime, List<AppointmentStatus> statuses);
+    List<Appointment> findByDoctorAndAppointmentDateAndStatusIn(Doctor doctor, LocalDate appointmentDate, List<AppointmentStatus> statuses);
 }

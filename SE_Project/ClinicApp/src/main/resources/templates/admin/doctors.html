@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Doctors - Admin - AppointCare Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; }
+        .container { display: flex; height: 100vh; }
+        .main-content { flex: 1; margin-left: 70px; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+
+        .page-header { margin-bottom: 24px; width: 100%; max-width: 1100px; }
+        .page-header h1 { font-size: 28px; font-weight: 800; color: #0f1f3d; margin-bottom: 4px; }
+        .page-header p { color: #64748b; font-size: 14px; }
+        .page-header p a { color: #0284c7; text-decoration: none; font-weight: 600; }
+        .page-header p a:hover { text-decoration: underline; }
+
+        .flash { padding: 13px 16px; border-radius: 10px; margin-bottom: 16px; width: 100%; max-width: 1100px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .flash-success { background: #dcfce7; border: 1px solid #bbf7d0; color: #166534; }
+        .flash-error   { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+
+        .card { background: #fff; border-radius: 14px; padding: 26px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 20px; width: 100%; max-width: 1100px; border: 1px solid #e8edf5; }
+        .card-title { font-size: 16px; font-weight: 700; color: #0f1f3d; display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+        .card-title i { color: #0284c7; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        th { padding: 12px 14px; text-align: left; font-weight: 700; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; }
+        td { padding: 13px 14px; border-bottom: 1px solid #f1f5f9; color: #1e293b; vertical-align: middle; font-size: 14px; }
+        tbody tr:hover { background: #f8fafc; }
+        .muted { color: #94a3b8; font-size: 14px; padding: 20px 0; }
+
+        .row-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+        .btn { padding: 7px 14px; border: none; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.18s; letter-spacing: 0.2px; }
+        .btn-approve { background: #22c55e; color: #fff; }
+        .btn-approve:hover { background: #16a34a; box-shadow: 0 2px 8px rgba(34,197,94,0.3); }
+        .btn-neutral { background: #0ea5e9; color: #fff; }
+        .btn-neutral:hover { background: #0284c7; box-shadow: 0 2px 8px rgba(2,132,199,0.3); }
+
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.3px; border: 1px solid transparent; }
+        .badge-count { background: #f1f5f9; color: #334155; border-color: #e2e8f0; font-size: 13px; }
+        .badge-approved { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .badge-pending  { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .badge-active   { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+        .badge-inactive { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
+        @media (max-width: 768px) { .main-content { padding: 24px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Manage Doctors</h1>
+            <p>View all doctors and manage their active status.
+                Pending applications are reviewed on the <a href="/admin/doctors/requests">Doctor Requests</a> page.</p>
+        </div>
+
+        <div th:if="${param.approved}" class="flash flash-success"><i class="fas fa-check-circle"></i> Doctor approved successfully.</div>
+        <div th:if="${param.rejected}" class="flash flash-success"><i class="fas fa-check-circle"></i> Doctor application rejected.</div>
+        <div th:if="${param.updated}" class="flash flash-success"><i class="fas fa-check-circle"></i> Doctor status updated.</div>
+        <div th:if="${error != null}" class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Error</span></div>
+
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-user-md"></i>
+                All Doctors
+                <span class="badge badge-count" th:text="${totalCount}">0</span>
+            </div>
+            <div th:if="${allDoctors != null && !allDoctors.isEmpty()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Approval</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${allDoctors}">
+                        <td style="font-weight:600;" th:text="${d.user != null ? d.user.fullName : '—'}">Name</td>
+                        <td style="color:#64748b;" th:text="${d.user != null ? d.user.email : '—'}">Email</td>
+                        <td th:text="${d.specialization != null ? d.specialization : '—'}">Specialization</td>
+                        <td th:text="${d.experienceYears != null ? d.experienceYears + ' yrs' : '—'}">0 yrs</td>
+                        <td>
+                            <span class="badge" th:classappend="${d.approved ? ' badge-approved' : ' badge-pending'}"
+                                  th:text="${d.approved ? 'APPROVED' : 'PENDING'}">PENDING</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${d.active ? ' badge-active' : ' badge-inactive'}"
+                                  th:text="${d.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+                        </td>
+                        <td>
+                            <div class="row-actions">
+                                <form th:if="${!d.approved}" th:action="@{/admin/doctors/{id}/approve(id=${d.id})}" method="POST">
+                                    <button class="btn btn-approve" type="submit">Approve</button>
+                                </form>
+                                <form th:action="@{/admin/doctors/{id}/toggle-active(id=${d.id})}" method="POST">
+                                    <button class="btn btn-neutral" type="submit" th:text="${d.active ? 'Deactivate' : 'Activate'}">Deactivate</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:unless="${allDoctors != null && !allDoctors.isEmpty()}" class="muted">No doctors found.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

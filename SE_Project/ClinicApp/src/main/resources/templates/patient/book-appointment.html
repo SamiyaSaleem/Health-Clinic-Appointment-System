@@ -5,187 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment - AppointCare Solutions</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; }
+        .container { display: flex; height: 100vh; }
+        .main-content { flex: 1; margin-left: 70px; padding: 40px; padding-bottom: 160px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-        }
+        .page-header { margin-bottom: 24px; width: 100%; max-width: 760px; }
+        .page-header h1 { font-size: 28px; font-weight: 800; color: #0f1f3d; margin-bottom: 4px; }
+        .page-header p { color: #64748b; font-size: 14px; }
 
-        .container {
-            display: flex;
-            height: 100vh;
-        }
+        .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; width: 100%; max-width: 760px; }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .alert-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        .main-content {
-            flex: 1;
-            margin-left: 70px;
-            padding: 40px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .form-container { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); border: 1px solid #e8edf5; max-width: 760px; width: 100%; }
+        .form-container.has-info { max-width: 1020px; }
 
-        .page-header {
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 720px;
-        }
+        .booking-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
+        .booking-grid.has-info { grid-template-columns: 1fr 300px; }
 
-        .page-header h1 {
-            font-size: 32px;
-            color: #1e3c72;
-            margin-bottom: 5px;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 13px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 14px; background: #f8fafc; transition: all 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0284c7; background: #fff; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
+        .form-group textarea { resize: vertical; min-height: 110px; }
+        .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230284c7' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: #f8fafc; padding-right: 36px; }
 
-        .page-header p {
-            color: #666;
-        }
+        .select-compact { padding: 8px 36px 8px 12px; font-size: 13px; }
 
-        .form-container {
-            background: white;
-            border-radius: 8px;
-            padding: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-width: 720px;
-            width: 100%;
-        }
+        .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .btn { flex: 1; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+        .btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; }
+        .btn-primary:hover { box-shadow: 0 4px 14px rgba(2,132,199,0.3); transform: translateY(-1px); }
+        .btn-secondary { background: #f1f5f9; color: #374151; border: 1.5px solid #e2e8f0; }
+        .btn-secondary:hover { background: #e2e8f0; }
 
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 24px;
-            }
+        .info-panel { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+        .is-hidden { display: none; }
+        .info-panel h3 { font-size: 12px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #0f1f3d; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+        .info-panel h3 i { color: #0284c7; }
+        .info-row { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid #e8edf5; font-size: 13px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-key { color: #64748b; font-weight: 600; }
+        .info-val { color: #111827; font-weight: 600; text-align: right; word-break: break-word; }
 
-            .form-container {
-                padding: 24px;
-            }
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: inherit;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #0284c7;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background-color: #0284c7;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #0369a1;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+        @media (max-width: 768px) { .main-content { padding: 24px; } .booking-grid, .booking-grid.has-info { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div th:replace="fragments/sidebar :: sidebar"></div>
+<div class="container">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Book an Appointment</h1>
+            <p>Select a doctor, choose a date and time, and provide your reason for the visit.</p>
+        </div>
 
-        <div class="main-content">
-            <div class="page-header">
-                <h1>Book Appointment</h1>
-                <p>Schedule your next healthcare consultation</p>
-            </div>
+        <div th:if="${error}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span></div>
+        <div th:if="${doctors == null || doctors.isEmpty()}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> No doctors are currently available.</div>
+        <div th:if="${param.booked}" class="alert alert-success"><i class="fas fa-check-circle"></i> Appointment booked successfully.</div>
 
-            <div class="form-container">
-                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-
-                <div th:if="${doctors == null || doctors.isEmpty()}" class="alert alert-error">
-                    No doctors are available right now.
-                </div>
-
-                <div th:if="${param.booked}" class="alert alert-success">
-                    ✓ Appointment booked successfully!
-                </div>
-
+        <div class="form-container">
+            <div class="booking-grid">
                 <form method="POST" th:action="@{/patient/appointments/new}">
                     <div class="form-group">
-                        <label for="specialization">Specialization *</label>
+                        <label for="specialization">Specialization</label>
                         <select id="specialization" name="specialization" required>
                             <option value="">-- Select Specialization --</option>
                             <option th:each="spec : ${specializations}" th:value="${spec}" th:text="${spec}"></option>
@@ -193,38 +79,50 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="doctor">Doctor *</label>
+                        <label for="doctor">Doctor</label>
                         <select id="doctor" name="doctorId" required>
                             <option value="">-- Select Doctor --</option>
                             <option
                                 th:each="doc : ${doctors}"
                                 th:value="${doc.id}"
-                                th:attr="data-spec=${doc.specialization}"
-                                th:text="${doc.user != null and doc.user.fullName != null ? doc.user.fullName : 'Doctor'}"
-                            ></option>
+                                th:attr="data-spec=${doc.specialization},data-qualifications=${doc.qualifications},data-experience=${doc.experienceYears},data-days=${doc.availableDays},data-start=${doc.availableTimeStart},data-end=${doc.availableTimeEnd},data-duration=${doc.appointmentDurationMinutes}"
+                                th:text="${doc.user != null and doc.user.fullName != null ? doc.user.fullName : 'Doctor'}">
+                            </option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="date">Appointment Date *</label>
+                        <label for="date">Appointment Date</label>
                         <input type="date" id="date" name="appointmentDate" required th:attr="min=${minDate}">
                     </div>
 
                     <div class="form-group">
-                        <label for="time">Appointment Time *</label>
-                        <input type="time" id="time" name="appointmentTime" required>
+                        <label for="timeSlot">Available Time Slot</label>
+                        <select id="timeSlot" name="appointmentTime" required disabled class="select-compact">
+                            <option value="">Select a doctor and date first</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="reason">Reason for Visit *</label>
-                        <textarea id="reason" name="reason" required placeholder="Describe your health concern..."></textarea>
+                        <label for="reason">Reason for Visit</label>
+                        <textarea id="reason" name="reason" required placeholder="Describe your health concern or reason for the appointment..."></textarea>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Book Appointment</button>
-                        <a href="/patient/appointments" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Book Appointment</button>
+                        <a href="/patient/appointments" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
+
+                <aside id="doctorInfoPanel" class="info-panel is-hidden" aria-label="Doctor information">
+                    <h3><i class="fas fa-user-md"></i> Doctor Information</h3>
+                    <div class="info-row"><div class="info-key">Specialization</div><div id="docSpec" class="info-val">—</div></div>
+                    <div class="info-row"><div class="info-key">Qualifications</div><div id="docQual" class="info-val">—</div></div>
+                    <div class="info-row"><div class="info-key">Experience</div><div id="docExp" class="info-val">—</div></div>
+                    <div class="info-row"><div class="info-key">Available Days</div><div id="docDays" class="info-val">—</div></div>
+                    <div class="info-row"><div class="info-key">Hours</div><div id="docHours" class="info-val">—</div></div>
+                    <div class="info-row"><div class="info-key">Slot Duration</div><div id="docDuration" class="info-val">—</div></div>
+                </aside>
             </div>
         </div>
     </div>
@@ -233,60 +131,121 @@
         (function () {
             const specializationSelect = document.getElementById('specialization');
             const doctorSelect = document.getElementById('doctor');
+            const dateInput = document.getElementById('date');
+            const timeSlotSelect = document.getElementById('timeSlot');
+            const docSpec = document.getElementById('docSpec');
+            const docQual = document.getElementById('docQual');
+            const docExp = document.getElementById('docExp');
+            const docDays = document.getElementById('docDays');
+            const docHours = document.getElementById('docHours');
+            const docDuration = document.getElementById('docDuration');
+            const doctorInfoPanel = document.getElementById('doctorInfoPanel');
+            const bookingGrid = document.querySelector('.booking-grid');
+            const formContainer = document.querySelector('.form-container');
             if (!specializationSelect || !doctorSelect) return;
 
-            const doctorData = Array.from(doctorSelect.querySelectorAll('option'))
-                .slice(1)
-                .map(opt => ({
-                    value: opt.value,
-                    text: opt.textContent || '',
-                    spec: (opt.getAttribute('data-spec') || '').trim().toLowerCase()
-                }));
+            const doctorData = Array.from(doctorSelect.querySelectorAll('option')).slice(1).map(opt => ({
+                value: opt.value, text: opt.textContent || '',
+                specRaw: (opt.getAttribute('data-spec') || '').trim(),
+                spec: (opt.getAttribute('data-spec') || '').trim().toLowerCase(),
+                qualifications: (opt.getAttribute('data-qualifications') || '').trim(),
+                experience: (opt.getAttribute('data-experience') || '').trim(),
+                days: (opt.getAttribute('data-days') || '').trim(),
+                start: (opt.getAttribute('data-start') || '').trim(),
+                end: (opt.getAttribute('data-end') || '').trim(),
+                duration: (opt.getAttribute('data-duration') || '').trim()
+            }));
 
-            function normalize(value) {
-                return (value || '').trim().toLowerCase();
-            }
+            function normalize(v) { return (v || '').trim().toLowerCase(); }
 
             function renderDoctorOptions() {
-                const specialization = normalize(specializationSelect.value);
-
+                const spec = normalize(specializationSelect.value);
                 doctorSelect.innerHTML = '';
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = '-- Select Doctor --';
-                doctorSelect.appendChild(placeholder);
-                doctorSelect.value = '';
-
-                if (!specialization) {
-                    doctorSelect.disabled = true;
-                    return;
-                }
-
-                const matching = doctorData.filter(d => d.spec === specialization);
+                const ph = document.createElement('option'); ph.value = ''; ph.textContent = '-- Select Doctor --'; doctorSelect.appendChild(ph);
+                if (!spec) { doctorSelect.disabled = true; return; }
+                const matching = doctorData.filter(d => d.spec === spec);
                 if (matching.length === 0) {
-                    const none = document.createElement('option');
-                    none.value = '';
-                    none.textContent = 'No doctors available for selected specialization';
-                    none.disabled = true;
-                    none.selected = true;
-                    doctorSelect.appendChild(none);
-                    doctorSelect.disabled = true;
-                    return;
+                    const none = document.createElement('option'); none.value = ''; none.textContent = 'No doctors available for selected specialization'; none.disabled = true; none.selected = true;
+                    doctorSelect.appendChild(none); doctorSelect.disabled = true; return;
                 }
-
                 matching.forEach(d => {
-                    const opt = document.createElement('option');
-                    opt.value = d.value;
-                    opt.textContent = d.text;
+                    const opt = document.createElement('option'); opt.value = d.value; opt.textContent = d.text;
+                    opt.setAttribute('data-spec', d.specRaw);
+                    if (d.qualifications) opt.setAttribute('data-qualifications', d.qualifications);
+                    if (d.experience) opt.setAttribute('data-experience', d.experience);
+                    if (d.days) opt.setAttribute('data-days', d.days);
+                    if (d.start) opt.setAttribute('data-start', d.start);
+                    if (d.end) opt.setAttribute('data-end', d.end);
+                    if (d.duration) opt.setAttribute('data-duration', d.duration);
                     doctorSelect.appendChild(opt);
                 });
-
                 doctorSelect.disabled = false;
             }
 
-            specializationSelect.addEventListener('change', renderDoctorOptions);
+            function clearDoctorInfo() {
+                ['docSpec','docQual','docExp','docDays','docHours','docDuration'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+                if (doctorInfoPanel) doctorInfoPanel.classList.add('is-hidden');
+                if (bookingGrid) bookingGrid.classList.remove('has-info');
+                if (formContainer) formContainer.classList.remove('has-info');
+            }
+
+            function updateDoctorInfo() {
+                const opt = doctorSelect.selectedOptions && doctorSelect.selectedOptions[0];
+                if (!opt || !opt.value) { clearDoctorInfo(); return; }
+                const spec = (opt.getAttribute('data-spec') || '').trim();
+                const qual = (opt.getAttribute('data-qualifications') || '').trim();
+                const exp  = (opt.getAttribute('data-experience') || '').trim();
+                const days = (opt.getAttribute('data-days') || '').trim();
+                const start = (opt.getAttribute('data-start') || '').trim();
+                const end   = (opt.getAttribute('data-end') || '').trim();
+                const dur   = (opt.getAttribute('data-duration') || '').trim();
+                if (docSpec) docSpec.textContent = spec || '—';
+                if (docQual) docQual.textContent = qual || '—';
+                if (docExp) docExp.textContent = exp ? `${exp} years` : '—';
+                if (docDays) docDays.textContent = days || '—';
+                if (docHours) docHours.textContent = (start && end) ? `${start} – ${end}` : '—';
+                if (docDuration) docDuration.textContent = dur ? `${dur} minutes` : '—';
+                if (doctorInfoPanel) doctorInfoPanel.classList.remove('is-hidden');
+                if (bookingGrid) bookingGrid.classList.add('has-info');
+                if (formContainer) formContainer.classList.add('has-info');
+            }
+
+            function setSlotState(msg, enabled) {
+                if (!timeSlotSelect) return;
+                timeSlotSelect.innerHTML = '';
+                const opt = document.createElement('option'); opt.value = ''; opt.textContent = msg;
+                timeSlotSelect.appendChild(opt); timeSlotSelect.disabled = !enabled;
+            }
+
+            async function refreshSlots() {
+                if (!timeSlotSelect || !dateInput) return;
+                const doctorId = doctorSelect.value; const date = dateInput.value;
+                if (!doctorId || !date) { setSlotState('Select a doctor and date first', false); return; }
+                setSlotState('Loading available slots...', false);
+                try {
+                    const res = await fetch(`/patient/appointments/slots?doctorId=${encodeURIComponent(doctorId)}&appointmentDate=${encodeURIComponent(date)}`, { headers: { 'Accept': 'application/json' } });
+                    if (!res.ok) throw new Error();
+                    const slots = await res.json();
+                    timeSlotSelect.innerHTML = '';
+                    const ph = document.createElement('option'); ph.value = ''; ph.textContent = '-- Select Time Slot --'; timeSlotSelect.appendChild(ph);
+                    if (!Array.isArray(slots) || slots.length === 0) {
+                        const none = document.createElement('option'); none.value = ''; none.textContent = 'No slots available for selected day'; none.disabled = true; none.selected = true;
+                        timeSlotSelect.appendChild(none); timeSlotSelect.disabled = true; return;
+                    }
+                    slots.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; timeSlotSelect.appendChild(o); });
+                    timeSlotSelect.disabled = false;
+                } catch (e) { setSlotState('Unable to load slots', false); }
+            }
+
+            specializationSelect.addEventListener('change', () => { renderDoctorOptions(); clearDoctorInfo(); setSlotState('Select a doctor and date first', false); });
+            doctorSelect.addEventListener('change', () => { updateDoctorInfo(); refreshSlots(); });
+            if (dateInput) dateInput.addEventListener('change', refreshSlots);
+
+            clearDoctorInfo();
+            setSlotState('Select a doctor and date first', false);
             renderDoctorOptions();
         })();
     </script>
+</div>
 </body>
 </html>
